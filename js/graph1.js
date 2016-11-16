@@ -16,6 +16,8 @@ d3.csv("../dream.csv", function(error,dataSet){
     var color2 = d3.scale.category20c();
     var colNum = ["frequency","memory","action","lucid","dejavu"];
     var mouseOn = false;
+    var hgCol = 0;
+    var pieCol = 3;
 
     function getNum(col, Data){
         result = [];
@@ -67,12 +69,13 @@ d3.csv("../dream.csv", function(error,dataSet){
 
     }
 
-    function histogram(col){
+    function histogram(col, div){
         var hg = {}, hgDim = {t:60, r:30, b:30, l:0};
         hgDim.w = 500 - hgDim.l - hgDim.r;
         hgDim.h = 300 - hgDim.t - hgDim.b;
 
-        var HGsvg = d3.select("#graph").append("svg")
+        var HGsvg = d3.select(div).append("svg")
+            .attr("id", "histogram")
             .attr("width", hgDim.w + hgDim.l + hgDim.r)
             .attr("height", hgDim.h + hgDim.t + hgDim.b)
             .append("g")
@@ -97,6 +100,14 @@ d3.csv("../dream.csv", function(error,dataSet){
             .attr("y", function(d,i){ return hgDim.h+20;})
             .attr("text-anchor", "middle");
 
+        /*
+        HGsvg.append("text")
+            .text(colNum[col])
+            .attr("x", hgDim.w/2)
+            .attr("y", hgDim.y)
+            .attr("class", "title");
+         //   .attr("text-anchor", "middle");
+*/
         var y = d3.scale.linear().range([hgDim.h, 0])
             .domain([0, d3.max(yData)]);
 
@@ -151,7 +162,6 @@ d3.csv("../dream.csv", function(error,dataSet){
 
             // Attach the new data to the bars.
             var bars = HGsvg.selectAll(".bar").data(nD);
-            console.log(mouseOn);
             // transition the height and color of rectangles.
 
             if(mouseOn) {
@@ -171,20 +181,49 @@ d3.csv("../dream.csv", function(error,dataSet){
                 .text(function(d){ return d3.format(",")(d)})
                 .attr("y", function(d) {return y(d)-5; });
         }
+
+        window.Hfilter = function(type){
+
+            console.log(type);
+            for(var i=0; i<5; i++) {
+                if (type == colNum[i])
+                    hgCol = i;
+            }
+            var nD = getNum(hgCol, dataSet);
+            console.log(hgCol);
+
+            d3.select("#histogram").remove();
+            d3.select("#piechart").remove();
+            d3.select("#legend").remove();
+            var hg = histogram(hgCol, "#graph");
+            var pc = piechart(pieCol, "#graph");
+            var leg = legend(pieCol, "#graph");
+        };
+
+
         return hg;
-    };
+    }
 
 
-    function piechart(col){
+    function piechart(col, div){
         var pc = {}, pieDim = {w:250, h:250};
         pieDim.r = Math.min(pieDim.w, pieDim.h)/2;
 
-        var PIEsvg = d3.select("#graph").append("svg")
+        var PIEsvg = d3.select("div").append("svg")
+            .attr("id", "piechart")
             .attr("width", pieDim.w)
             .attr("height", pieDim.h)
             .append("g")
             .attr("transform", "translate("+pieDim.w/2+","+pieDim.h/2+")");
 
+        /*
+        PIEsvg.append("text")
+            .text(colNum[col])
+            .attr("x", pieDim.w/2)
+            .attr("y", pieDim.h/2)
+            .attr("class", "title");
+           // .attr("text-anchor", "middle");
+*/
         // create function to draw the arcs of the pie slices.
         var arc = d3.svg.arc().outerRadius(pieDim.r - 10).innerRadius(0);
 
@@ -202,11 +241,22 @@ d3.csv("../dream.csv", function(error,dataSet){
             .on("mouseout", mouseout);
 
 
+
         function mouseover(d, i){
 
             mouseOn = true;
             //selected
-            var st = dataSet.filter(function(s){ return s.frequency-1 == i;})
+            if(col==0)
+                var st = dataSet.filter(function(s){ return s.frequency-1 == i;});
+            else if(col==1)
+                var st = dataSet.filter(function(s){ return s.memory-1 == i;});
+            else if(col==2)
+                var st = dataSet.filter(function(s){ return s.action-1 == i;});
+            else if(col==3)
+                var st = dataSet.filter(function(s){ return s.lucid-1 == i;});
+            else if(col==4)
+                var st = dataSet.filter(function(s){ return s.dejavu-1 == i;});
+
             var nData = getNum(hgCol, st);
             hg.update(nData, color2(i));
 
@@ -214,7 +264,7 @@ d3.csv("../dream.csv", function(error,dataSet){
         function mouseout(d){
 
             mouseOn = false;
-            var nData = getNum(4, dataSet);
+            var nData = getNum(hgCol, dataSet);
             hg.update(nData, nData.map(function(v, i) {
                 return color1(i);
             }));
@@ -232,14 +282,32 @@ d3.csv("../dream.csv", function(error,dataSet){
             this._current = i(0);
             return function(t) {return arc(i(t));};
         }
+
+        window.Pfilter = function(type){
+
+            console.log(type);
+            for(var i=0; i<4; i++) {
+                if (type == colNum[i])
+                    pieCol = i;
+            }
+            var nD = getNum(pieCol, dataSet);
+
+            d3.select("#histogram").remove();
+            d3.select("#piechart").remove();
+            d3.select("#legend").remove();
+            var hg = histogram(hgCol, "#graph");
+            var pc = piechart(pieCol, "#graph");
+            var leg = legend(pieCol, "#graph");
+        };
+
         return pc;
     }
 
-    function legend(col){
+    function legend(col, div){
         var leg = {};
 
         // create table for legend.
-        var legend = d3.select("#graph").append("table").attr('class','legend');
+        var legend = d3.select("div").append("table").attr("id", "legend").attr('class','legend');
 
         var Data = getNum(col, dataSet);
 
@@ -278,10 +346,13 @@ d3.csv("../dream.csv", function(error,dataSet){
         return leg;
     }
 
-    var hgCol = 3;
-    var pieCol = 0;
-
-    var hg = histogram(hgCol);
-    var pc = piechart(pieCol); //freq
-    var leg = legend(pieCol); //freq
+    var hg = histogram(hgCol, "#graph");
+    var pc = piechart(pieCol, "#graph"); //freq
+    var leg = legend(pieCol, "#graph"); //freq
+  //  var hg1 = histogram(2, "#graph2");
+   // var pc1 = piechart(0,"#graph2"); //freq
+   // var leg1 = legend(0,"#graph2"); //freq
+  //  var hg2 = histogram(0);
+   // var pc2 = piechart(3); //freq
+   // var leg2 = legend(3); //freq
 });

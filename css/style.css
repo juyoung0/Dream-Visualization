@@ -31,3 +31,8 @@ rect:hover {  fill:blue; }
     align:right;
     width:50px;
 }
+
+.title {
+    font-family: Calibri;
+    font-size: 20pt;
+}
