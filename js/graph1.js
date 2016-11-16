@@ -44,7 +44,7 @@ d3.csv("../dream.csv", function(error,dataSet){
             else if (d == 3) return "few times / year";
         }
         else if(col==1) {//memory
-            if (d == 0) return "Memorize in detail";
+            if (d == 0) return "Memorize vividly";
             else if (d == 1) return "Remember dimly";
             else if (d == 2) return "Forget all";
         }
@@ -54,15 +54,15 @@ d3.csv("../dream.csv", function(error,dataSet){
             else if (d == 2) return "Nothing";
         }
         else if(col==3) {//lucid
-            if (d == 0) return "Control feerly";
-            else if (d == 1) return "Frequently experienced";
-            else if (d == 2) return "few times in lifetime";
-            else if (d == 3) return "Never experienced";
+            if (d == 0) return "Control freely";
+            else if (d == 1) return "Frequently";
+            else if (d == 2) return "few times";
+            else if (d == 3) return "Never";
         }
         else if(col==4) {//dejavu
-            if (d == 0) return "Frequently experienced";
+            if (d == 0) return "Frequently";
             else if (d == 1) return "several times";
-            else if (d == 2) return "Never experienced";
+            else if (d == 2) return "Never";
         }
 
     }
@@ -78,8 +78,12 @@ d3.csv("../dream.csv", function(error,dataSet){
             .append("g")
             .attr("transform", "translate(" + hgDim.l + "," + hgDim.t + ")");
 
+        var domainArray = [];
+        if(maxVal[col]==3)  domainArray = [0, 1, 2];
+        else domainArray = [0, 1, 2, 3];
+
         var x = d3.scale.ordinal()
-            .domain([0, 1, 2])
+            .domain(domainArray)
             .rangeRoundBands([0, hgDim.w], 0.1);
 
         yData = getNum(col, dataSet);
@@ -119,14 +123,24 @@ d3.csv("../dream.csv", function(error,dataSet){
 
         function mouseover(d,i){
             //selected
-            var st = dataSet.filter(function(s){ return s.dejavu-1 == i;})
-            var nData = getNum(0, st);
+            if(col==0)
+                var st = dataSet.filter(function(s){ return s.frequency-1 == i;});
+            else if(col==1)
+                var st = dataSet.filter(function(s){ return s.memory-1 == i;});
+            else if(col==2)
+                var st = dataSet.filter(function(s){ return s.action-1 == i;});
+            else if(col==3)
+                var st = dataSet.filter(function(s){ return s.lucid-1 == i;});
+            else if(col==4)
+                var st = dataSet.filter(function(s){ return s.dejavu-1 == i;});
+
+            var nData = getNum(pieCol, st);
 
             pc.update(nData);
             leg.update(nData);
         }
         function mouseout(d){
-            var nData = getNum(0, dataSet);
+            var nData = getNum(pieCol, dataSet);
             pc.update(nData);
             leg.update(nData);
         }
@@ -193,7 +207,7 @@ d3.csv("../dream.csv", function(error,dataSet){
             mouseOn = true;
             //selected
             var st = dataSet.filter(function(s){ return s.frequency-1 == i;})
-            var nData = getNum(4, st);
+            var nData = getNum(hgCol, st);
             hg.update(nData, color2(i));
 
         }
@@ -264,7 +278,10 @@ d3.csv("../dream.csv", function(error,dataSet){
         return leg;
     }
 
-    var hg = histogram(4);
-    var pc = piechart(0); //freq
-    var leg = legend(0); //freq
+    var hgCol = 3;
+    var pieCol = 0;
+
+    var hg = histogram(hgCol);
+    var pc = piechart(pieCol); //freq
+    var leg = legend(pieCol); //freq
 });
