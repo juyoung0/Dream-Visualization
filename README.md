@@ -10,7 +10,7 @@ Action
 1=memo it, 2=tell somebody, 3=nothing
 
 Lucid
-1=can controll and do whenever, 2=frequently experience, 3=not usually but sometimes 4=never experienced
+1=can control and do whenever, 2=frequently experience, 3=not usually but sometimes 4=never experienced
 
 Dejavu
 1=frequently experience, 2=several experience, 3=never
