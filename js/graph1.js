@@ -100,14 +100,6 @@ d3.csv("../dream.csv", function(error,dataSet){
             .attr("y", function(d,i){ return hgDim.h+20;})
             .attr("text-anchor", "middle");
 
-        /*
-        HGsvg.append("text")
-            .text(colNum[col])
-            .attr("x", hgDim.w/2)
-            .attr("y", hgDim.y)
-            .attr("class", "title");
-         //   .attr("text-anchor", "middle");
-*/
         var y = d3.scale.linear().range([hgDim.h, 0])
             .domain([0, d3.max(yData)]);
 
@@ -134,6 +126,7 @@ d3.csv("../dream.csv", function(error,dataSet){
 
         function mouseover(d,i){
             //selected
+            console.log("mouseover");
             if(col==0)
                 var st = dataSet.filter(function(s){ return s.frequency-1 == i;});
             else if(col==1)
@@ -150,7 +143,9 @@ d3.csv("../dream.csv", function(error,dataSet){
             pc.update(nData);
             leg.update(nData);
         }
+
         function mouseout(d){
+            console.log("mouseout");
             var nData = getNum(pieCol, dataSet);
             pc.update(nData);
             leg.update(nData);
@@ -190,14 +185,13 @@ d3.csv("../dream.csv", function(error,dataSet){
                     hgCol = i;
             }
             var nD = getNum(hgCol, dataSet);
-            console.log(hgCol);
 
             d3.select("#histogram").remove();
             d3.select("#piechart").remove();
             d3.select("#legend").remove();
-            var hg = histogram(hgCol, "#graph");
-            var pc = piechart(pieCol, "#graph");
-            var leg = legend(pieCol, "#graph");
+            hg = histogram(hgCol, "#graph");
+            pc = piechart(pieCol, "#graph");
+            leg = legend(pieCol, "#graph");
         };
 
 
@@ -239,8 +233,6 @@ d3.csv("../dream.csv", function(error,dataSet){
             .style("fill", function(d,i) {return color2(i);})
             .on("mouseover", mouseover)
             .on("mouseout", mouseout);
-
-
 
         function mouseover(d, i){
 
@@ -286,7 +278,7 @@ d3.csv("../dream.csv", function(error,dataSet){
         window.Pfilter = function(type){
 
             console.log(type);
-            for(var i=0; i<4; i++) {
+            for(var i=0; i<5; i++) {
                 if (type == colNum[i])
                     pieCol = i;
             }
@@ -295,9 +287,9 @@ d3.csv("../dream.csv", function(error,dataSet){
             d3.select("#histogram").remove();
             d3.select("#piechart").remove();
             d3.select("#legend").remove();
-            var hg = histogram(hgCol, "#graph");
-            var pc = piechart(pieCol, "#graph");
-            var leg = legend(pieCol, "#graph");
+            hg = histogram(hgCol, "#graph");
+            pc = piechart(pieCol, "#graph");
+            leg = legend(pieCol, "#graph");
         };
 
         return pc;
