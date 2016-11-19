@@ -16,8 +16,8 @@ d3.csv("../dream.csv", function(error,dataSet) {
     var color2 = d3.scale.category20c();
     var colNum = ["frequency", "memory", "action", "lucid", "dejavu"];
     var mouseOn = false;
-    var hgCol = 0;
-    var pieCol = 3;
+    var hgCol = 3;
+    var pieCol = 0;
 
     function getNum(col, Data) {
         result = [];
@@ -217,8 +217,6 @@ d3.csv("../dream.csv", function(error,dataSet) {
             pc = piechart(pieCol, "#graph");
             leg = legend(pieCol, "#graph");
         };
-
-
         return hg;
     }
 
@@ -376,10 +374,6 @@ d3.csv("../dream.csv", function(error,dataSet) {
         return leg;
     }
 
-    var hg = histogram(hgCol, "#graph");
-    var pc = piechart(pieCol, "#graph");
-    var leg = legend(pieCol, "#graph");
-
     function filtering(col, data, i) {
         if (col == 0)
             var st = data.filter(function (s) {
@@ -406,9 +400,9 @@ d3.csv("../dream.csv", function(error,dataSet) {
     }
 
     function plot(row, col, div) {
-        var p = {}, pDim = {t: 60, r: 15, b: 30, l: 15};
-        pDim.w = 500 - pDim.l - pDim.r;
-        pDim.h = 300 - pDim.t - pDim.b;
+        var pl = {}, pDim = {t: 100, r: 200, b: 100, l: 200};
+        pDim.w = 1000 - pDim.l - pDim.r;
+        pDim.h = 800 - pDim.t - pDim.b;
 
         var PLOTsvg = d3.select(div).append("svg")
             .attr("id", "plot")
@@ -433,15 +427,54 @@ d3.csv("../dream.csv", function(error,dataSet) {
             .domain(yDomain)
             .rangeRoundBands([pDim.h, 0], 0.1);
 
+        PLOTsvg.append("g")
+            .selectAll("text")
+            .data(xDomain).enter()
+            .append("text")
+            .text(function (d, i) {
+                return getText(row, maxVal[row]-1-i);
+            })
+            .attr("x", function (d, i) {
+                return x(i) + pDim.l;
+            })
+            .attr("y", function (d, i) {
+                return pDim.h;
+            })
+            .attr("text-anchor", "middle");
+
+        PLOTsvg.append("g")
+            .selectAll("text")
+            .data(xDomain).enter()
+            .append("text")
+            .text(function (d, i) {
+                return getText(col, maxVal[col]-1-i);
+            })
+            .attr("x", function (d, i) {
+                return 0;
+            })
+            .attr("y", function (d, i) {
+                return y(i);
+            })
+            .attr("text-anchor", "middle");
+
+        //made data array
         var plotArray = [];
         for (var i = 0; i < xDomain.length; i++) {
-          //  plotArray[i] = new Array(yDomain.length);
             var st = filtering(row, dataSet, i);
             for (var j = 0; j < yDomain.length; j++) {
                 var st2 = filtering(col, st, j);
-                plotArray[3*i + j] = st2.length;
+                plotArray[(yDomain.length)*i + j] = st2.length;
             }
         }
+
+        //tool tip
+        var tip = d3.tip()
+            .attr('class', 'd3-tip')
+            .offset([-10, 0])
+            .html(function(d, i) {
+                return "<span style='color:red'>" + plotArray[i] + "</span> <strong>in 143</strong>";
+            })
+        PLOTsvg.call(tip);
 
         var dots = PLOTsvg.selectAll(".circle")
             .data(plotArray)
@@ -454,37 +487,54 @@ d3.csv("../dream.csv", function(error,dataSet) {
                 return x(xPoisition(plotArray.length, maxVal[row], i));
             })
             .attr("cy", function(d, i) {
-                return y(maxVal[col] - 1 - i%(maxVal[row]-1));
+                return y(maxVal[col] - 1 - i%(maxVal[row]));
             })
             .attr("r", function(d, i) {
-                return plotArray[i];
+                return Math.round(Math.sqrt(plotArray[i])*10);
             })
-            .attr("fill", function (d, i) {
-                return "blue";
-            });
-           // .on("mouseover", mouseover)
-           // .on("mouseout", mouseout);
+            .attr("transform", "translate(" + pDim.l + " , 0)")
+           // .transition().duration(500)
+            .style("opacity", 0.5)
+            .on('mouseover', tip.show)
+            .on('mouseout', tip.hide);
+           // .on("mouseover", function(){return tooltip.style("visibility", "visible");})
+            //.on("mousemove", function(){return tooltip.style("top",
+            //    (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");})
+            //.on("mouseout", function(){return tooltip.style("visibility", "hidden");});
+
+        dots.append("text")
+            .text(function (d, i) {
+                var percentage = d3.format("%")(plotArray[i] / d3.sum(plotArray.map(function (v) {return v;})));
+                return percentage;
+            })
+            .attr("x", function (d, i) {
+                return x(xPoisition(plotArray.length, maxVal[row], i));
+            })
+            .attr("y", function (d, i) {
+                return y(maxVal[col] - 1 - i%(maxVal[row]));
+            })
+            .attr("transform", "translate(" + pDim.l + " , 0)")
+            .transition().duration(500)
+            .attr("text-anchor", "middle");
 
         function xPoisition(length, row, i){
             var num = length / row;
             var pos = 0;
             for(var j=1; j<=num; j++){
-                if(i < j*row) {
+                if(i < j*(row)) {
                     pos = row - j;
                     j = 2*num;
                 }
             }
-            console.log(pos);
+           // console.log(length);
+           // console.log(row);
             return pos;
         }
-/*
-        var sum = 0;
-    for (var i = 0; i < maxVal[3]; i++) {
-        for (var j = 0; j < maxVal[0]; j++) {
-            sum += plotArray[i][j];
-        }
-    }*/
 
+        return pl;
     }
-    plotArray = plot(0, 1, "#graph2");
+    var hg = histogram(hgCol, "#graph");
+    var pc = piechart(pieCol, "#graph");
+    var leg = legend(pieCol, "#graph");
+    var pl = plot(hgCol, pieCol, "#graph2");
 });
