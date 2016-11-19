@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://d3js.org/d3.v3.min.js" type="text/javascript"></script>
+    <link rel="stylesheet" type="text/css" href="../css/style.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+    <title>Grpah1</title>
+</head>
+<body>
+<script src="../js/graph3.js" type="text/javascript"></script>
+<div class="container">
+    <form>
+        <label><input type="radio" name="mode" value="grouped"> Grouped</label>
+        <label><input type="radio" name="mode" value="stacked" checked> Stacked</label>
+    </form>
+</div>
+<div class="container">
+    X-axis
+    <div class="form-group">
+        <div class="btn-group btn-group-justified" data-toggle="buttons">
+            <label class="btn btn-default">
+                <input type="button"  name="histogram" title="frequency" onclick="rowFilter(this.title)">Frequency
+            </label>
+            <label class="btn btn-default">
+                <input type="button"  name="histogram" title="memory" onclick="rowFilter(this.title)">Memory
+            </label>
+            <label class="btn btn-default">
+                <input type="button"  name="histogram" title="action" onclick="rowFilter(this.title)">Action
+            </label>
+            <label class="btn btn-default">
+                <input type="button"  name="histogram" title="lucid" onclick="rowFilter(this.title)">Lucid
+            </label>
+            <label class="btn btn-default">
+                <input type="button"  name="histogram" title="dejavu" onclick="rowFilter(this.title)">Dejavu
+            </label>
+        </div>
+    </div>
+    Y-axis
+    <div class="form-group">
+        <div class="btn-group btn-group-justified" data-toggle="buttons">
+            <label class="btn btn-default">
+                <input type="button"  name="pie" title="frequency" onclick="colFilter(this.title)">Frequency
+            </label>
+            <label class="btn btn-default">
+                <input type="button"  name="pie" title="memory" onclick="colFilter(this.title)">Memory
+            </label>
+            <label class="btn btn-default">
+                <input type="button"  name="pie" title="action" onclick="colFilter(this.title)">Action
+            </label>
+            <label class="btn btn-default">
+                <input type="button"  name="pie" title="lucid" onclick="colFilter(this.title)">Lucid
+            </label>
+            <label class="btn btn-default">
+                <input type="button"  name="pie" title="dejavu" onclick="colFilter(this.title)">Dejavu
+            </label>
+        </div>
+    </div>
+</div>
+<div class="container" id="graph"></div>
+</body>
+</html>

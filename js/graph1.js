@@ -91,6 +91,9 @@ d3.csv("../dream.csv", function(error,dataSet) {
 
         yData = getNum(col, dataSet);
 
+        var y = d3.scale.linear().range([hgDim.h, 0])
+            .domain([0, d3.max(yData)]);
+
         HGsvg.append("g")
             .selectAll("text")
             .data(yData).enter()
@@ -106,8 +109,6 @@ d3.csv("../dream.csv", function(error,dataSet) {
             })
             .attr("text-anchor", "middle");
 
-        var y = d3.scale.linear().range([hgDim.h, 0])
-            .domain([0, d3.max(yData)]);
 
         var bars = HGsvg.selectAll(".bar")
             .data(yData)
@@ -219,7 +220,6 @@ d3.csv("../dream.csv", function(error,dataSet) {
         };
         return hg;
     }
-
 
     function piechart(col, div) {
         var pc = {}, pieDim = {w: 250, h: 250};
