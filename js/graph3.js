@@ -21,8 +21,8 @@ d3.csv("../dream.csv", function(error,dataSet) {
         for (var j = 0; j < maxVal[col]; j++) {
             result[j] = 0;
         }
-
         var val;
+
         for (var i = 0; i < Data.length; i++) {
             if (col == 0) val = Data[i].frequency;
             else if (col == 1) val = Data[i].memory;
@@ -92,9 +92,9 @@ d3.csv("../dream.csv", function(error,dataSet) {
     }
 
     function stacks(row, col, div) {
-        var stk = {}, sDim = {t: 30, r: 40, b: 40, l: 10};
-        sDim.w = 1000 - sDim.l - sDim.r;
-        sDim.h = 600 - sDim.t - sDim.b;
+        var stk = {}, sDim = {t: 30, r: 200, b: 40, l: 70};
+        sDim.w = screen.availWidth * 0.6 - sDim.l - sDim.r;
+        sDim.h = screen.availWidth * 0.4 - sDim.t - sDim.b;
 
         var n = maxVal[row], // number of samples per layer
             m = maxVal[col]; // number of layers
@@ -108,6 +108,8 @@ d3.csv("../dream.csv", function(error,dataSet) {
             layers = stack(nData),
             yGroupMax = d3.max(layers, function(layer) { return d3.max(layer, function(d) { return d.y; }); }),
             yStackMax = d3.max(layers, function(layer) { return d3.max(layer, function(d) { return d.y0 + d.y; }); });
+
+        console.log(nData);
 
         var x = d3.scale.ordinal()
             .domain(d3.range(n))
@@ -135,6 +137,18 @@ d3.csv("../dream.csv", function(error,dataSet) {
             .append("g")
             .attr("transform", "translate(" + sDim.l + "," + sDim.t + ")");
 
+
+        var tip = d3.tip()
+            .attr('class', 'd3-tip')
+            .offset([-10, 0])
+            .html(function (d, i) {
+                var percentage1 = d3.format("%")(d.y / 143);
+                var percentage2 = d3.format("%")(d.y / getNum(row, dataSet)[d.x]);
+                return "<span style='color:red'>" + percentage1 + "</span> <strong>" + "in total" + "</strong> <br>"
+                        + "<span style='color:#ffd209'>" + percentage2 + "</span> <strong>" + "in " + getText(row ,d.x) + "</strong> </br>";
+            })
+        STsvg.call(tip);
+
         //x-axis
         STsvg.append("g")
             .selectAll("text")
@@ -144,13 +158,11 @@ d3.csv("../dream.csv", function(error,dataSet) {
                 return getText(row, i);
             })
             .attr("x", function (d, i) {
-                return x(i) + sDim.l;
+                return x(i);
             })
             .attr("y", function (d, i) {
-                return sDim.h + sDim.b;
+                return sDim.h + sDim.b - 10;
             })
-           // .attr("transform", "translate(0," + sDim.h + ")")
-            //.attr("text-anchor", "middle")
             .style("fill", "black")
             .style("font-size", "13pt");
 
@@ -165,8 +177,11 @@ d3.csv("../dream.csv", function(error,dataSet) {
             .enter().append("rect")
             .attr("x", function(d) { return x(d.x); })
             .attr("y", sDim.h)
-            .attr("width", x.rangeBand())
-            .attr("height", 0);
+            .attr("width", x.rangeBand()/2)
+            .attr("height", 0)
+            .on('mouseover', tip.show)
+            .on('mouseout', tip.hide);
+
 
         rect.transition()
             .delay(function(d, i) { return i * 10; })
@@ -229,13 +244,13 @@ d3.csv("../dream.csv", function(error,dataSet) {
             .style("font", "15px sans-serif");
 
         legend.append("rect")
-            .attr("x", sDim.w - 20)
+            .attr("x", sDim.w + sDim.l + 10 )
             .attr("width", 20)
             .attr("height", 20)
             .attr("fill", function(d, i) { return color(i)});
 
         legend.append("text")
-            .attr("x", sDim.w -20)
+            .attr("x", sDim.w + sDim.l)
             .attr("y", 9)
             .attr("dy", ".35em")
             .attr("text-anchor", "end")
@@ -266,8 +281,5 @@ d3.csv("../dream.csv", function(error,dataSet) {
         return stk;
     }
 
-
-
     var stk = stacks(row, col, "#graph");
-
 });
