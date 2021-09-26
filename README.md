@@ -31,11 +31,3 @@
 ### Dejavu ###
 * 데자뷰를 겪는 빈도
 * 1=frequently experience, 2=several experience, 3=never
-
-
-### 데모 영상 ###
-[자세한 내용은 여기서 볼 수 있습니다](https://github.com/juyoung0/MAC/blob/dc267feb0bf3e506024b871e6e024d8cb4a2176b/doc/MAC_Project.pdf)
-![MAC_Demo_Faster](https://user-images.githubusercontent.com/8486747/128325494-cf69b5fd-56d3-476a-8546-2ff191a3cbf5.gif)
-
-
-
